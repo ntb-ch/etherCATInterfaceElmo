@@ -24,7 +24,6 @@ bool EtherCATInterfaceElmo::recoverAllDrivesFromFault()
 bool EtherCATInterfaceElmo::switchOnAllDrives()
 {
 	bool allDrivesAreSwitchedOn = true;
-	
 	for (int driveNumber = 0; driveNumber < numberOfDrives; driveNumber++) {
 		if (!switchOnDrive( driveNumber )) {
 			allDrivesAreSwitchedOn = false;
@@ -37,6 +36,8 @@ bool EtherCATInterfaceElmo::switchOnAllDrives()
 bool EtherCATInterfaceElmo::switchOnDrive(int driveNumber)
 {
 	driveStatus_ELMO  driveState = getDriveStatusElmo(driveNumber);
+	if ( driveState == driveStatus_ELMO::switchedOn)
+        return true;
 
 	// Elmo: GoldLine "CAN DS-402 Implementation Guide"		p.36
 	// 0:	'start' -> 'not ready to switch on'					: The drive self-tests and/or self-initializes
@@ -47,7 +48,7 @@ bool EtherCATInterfaceElmo::switchOnDrive(int driveNumber)
 // 	if (checkMaskedBits( driveState, faultValue, faultMask)) {
 	if ( driveState == driveStatus_ELMO::fault ) {
 		setControlWord(driveNumber, faultReset);
-// 				log.trace() << "drive " << driveNumber << " is in 15 fault reset";
+// 				std::cout << "drive " << driveNumber << " is in 15 fault reset" << std::endl;
 	}
 	
 	
@@ -55,17 +56,20 @@ bool EtherCATInterfaceElmo::switchOnDrive(int driveNumber)
 // 	if (checkMaskedBits( driveState, switchOnDisabledValue, switchOnDisabledMask)) {
 	if ( driveState == driveStatus_ELMO::switchOnDisabled ) {
 		setControlWord(driveNumber, shutdown);
-// 				log.trace() << "drive " << driveNumber << " is in 2: switch on disabled";
+// 				std::cout << "drive " << driveNumber << " is in 2: switch on disabled" << std::endl;
 	}
 	
 	// 3:	'ready to switch on' -> 'switched on'				:
 // 	if (checkMaskedBits( driveState, readyToSwitchOnValue, readyToSwitchOnMask)) {
 	if ( driveState == driveStatus_ELMO::readyToSwitchOn ) {
 		setControlWord(driveNumber, switchOn);	
-// 				log.trace() << "drive " << driveNumber << " is in 3: ready to switch on";
+// 				std::cout << "drive " << driveNumber << " is in 3: ready to switch on" << std::endl;
 	}
 	
-	return getIsDriveSwitchedOn( driveNumber ) ;
+	return false;
+	
+// 	if ( getDriveStatusElmo(int driveNumber) == driveStatus_ELMO::switchedOn)
+//         return getIsDriveSwitchedOn( driveNumber ) ;
 }
 
 bool EtherCATInterfaceElmo::enableAllDrives()

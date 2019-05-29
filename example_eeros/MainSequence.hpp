@@ -29,6 +29,7 @@ public:
 		
 	int action() {	
 		log.info() << "Initializing drives:";
+//         elmoDrives.ll_setControlWord(0);
 	}
 	
 	bool checkExitCondition() {
@@ -71,10 +72,10 @@ public:
 	int action() {
 		
 		log.info() << "Homing drive: " << drive;
+        elmoDrives.enableCapturingIndexPulse(drive);
 		elmoDrives.ll_setTargetVelocity(drive, 0);
 		elmoDrives.setModeOfOperation(drive, etherCATInterface::cyclicSynchronousVelocity);
         elmoDrives.enableDrive(drive);
-        wait(1);
 		elmoDrives.ll_setTargetVelocity(drive, 5000);
 		
 		int attempts = 0;
@@ -125,14 +126,8 @@ public:
         elmoDrives.ll_setTargetVelocity(drive, 0);
 		elmoDrives.setModeOfOperation(drive, etherCATInterface::cyclicSynchronousVelocity);
         elmoDrives.enableDrive(drive);
-        wait(1);
 		elmoDrives.ll_setTargetVelocity(drive, velocity);
-		
-        
-        
-// 		elmoDrives.setModeOfOperation(drive, etherCATInterface::cyclicSynchronousVelocity);
-// 		elmoDrives.ll_setTargetVelocity(drive, velocity);
-        log.info() << "ll_getStatusWord("<<drive<<"): 0x" << elmoDrives.getDriveStatusStringElmo(drive);
+//         log.info() << "ll_getStatusWord("<<drive<<"): 0x" << elmoDrives.getDriveStatusStringElmo(drive);
 	}
 	
 private:
@@ -182,27 +177,16 @@ public:
 		CS.velocityChecker.setActiveLevel(safetyProp.slDrivesDisabled);
 		CS.velocityChecker.registerSafetyEvent(SS, safetyProp.doEmergency);
 		CS.velocityChecker.setLimits(-100000, 100000);
-// 		wait(2);
 		CS.velocityChecker.reset();
-        
-			log.info() << "ll_getStatusWord(0): 0x" << elmoDrives.getDriveStatusStringElmo(0);
-			log.info() << "ll_getStatusWord(1): 0x" << elmoDrives.getDriveStatusStringElmo(1);
+
         elmoDrives.ll_setControlWord(0, cwc_faultReset);
         elmoDrives.ll_setControlWord(1, cwc_faultReset);
         wait(1);
-			log.info() << "ll_getStatusWord(0): 0x" << elmoDrives.getDriveStatusStringElmo(0);
-			log.info() << "ll_getStatusWord(1): 0x" << elmoDrives.getDriveStatusStringElmo(1);
-        elmoDrives.ll_setControlWord(0, cwc_shutdown);
-        elmoDrives.ll_setControlWord(1, cwc_shutdown);
-        wait(1);
-			log.info() << "ll_getStatusWord(0): 0x" << elmoDrives.getDriveStatusStringElmo(0);
-			log.info() << "ll_getStatusWord(1): 0x" << elmoDrives.getDriveStatusStringElmo(1);
-// 		step_initDrives();
-			log.info() << "ll_getStatusWord(0): 0x" << elmoDrives.getDriveStatusStringElmo(0);
-			log.info() << "ll_getStatusWord(1): 0x" << elmoDrives.getDriveStatusStringElmo(1);   
-
+        step_initDrives();
         
 //         // homing drives with index pulse (manual switch)
+        log.info() << "Homing test started";
+		log.info() << "///////////////////";
 		SS.triggerEvent(safetyProp.enableDrives);
 		step_homingDrives(1);
 		SS.triggerEvent(safetyProp.disableDrives);
@@ -224,42 +208,9 @@ public:
 		log.info() << "Set velocity test started";
 		log.info() << "/////////////////////////";
 		SS.triggerEvent(safetyProp.enableDrives);
+		step_setVelocity(0, 5000);
+		wait(4);
 		step_setVelocity(0, 0);
-		elmoDrives.enableDrive(0);
-		step_setVelocity(1, 0);
-		elmoDrives.enableDrive(0);
-			log.info() << "ll_getStatusWord(0): 0x" << elmoDrives.getDriveStatusStringElmo(0);
-			log.info() << "ll_getStatusWord(1): 0x" << elmoDrives.getDriveStatusStringElmo(1);
-		wait(1);
-			log.info() << "ll_getStatusWord(0): 0x" << elmoDrives.getDriveStatusStringElmo(0);
-			log.info() << "ll_getStatusWord(1): 0x" << elmoDrives.getDriveStatusStringElmo(1);
-		step_setVelocity(0, -5000);
-			log.info() << "ll_getStatusWord(0): 0x" << elmoDrives.getDriveStatusStringElmo(0);
-			log.info() << "ll_getStatusWord(1): 0x" << elmoDrives.getDriveStatusStringElmo(1);
-		wait(4);
-			log.info() << "SS level:                     " << SS.getCurrentLevel();
-			log.info() << "DI:                           0x" << std::hex << CS.getElmos.getOutDigitalInputs().getSignal().getValue();
-			log.info() << "Velocity:                     " << CS.getElmos.getOutVelocity().getSignal().getValue();
-			log.info() << "Vel SC:                       " << CS.demuxVelocities.getOut(1).getSignal().getValue();
-			log.info() << "getPosition(1):               " << elmoDrives.getPosition(1);
-			log.info() << "ll_getPositionActualValue(1): " << elmoDrives.ll_getPositionActualValue(1);
-			log.info() << "ll_getStatusWord(0): 0x" << elmoDrives.getDriveStatusStringElmo(0);
-			log.info() << "ll_getStatusWord(1): 0x" << elmoDrives.getDriveStatusStringElmo(1);
-			log.info();
-            elmoDrives.enableDrive(0);
-            elmoDrives.enableDrive(1);
-		wait(4);
-			log.info() << "SS level:                     " << SS.getCurrentLevel();
-			log.info() << "DI:                           0x" << std::hex << CS.getElmos.getOutDigitalInputs().getSignal().getValue();
-			log.info() << "Velocity:                     " << CS.getElmos.getOutVelocity().getSignal().getValue();
-			log.info() << "Vel SC:                       " << CS.demuxVelocities.getOut(1).getSignal().getValue();
-			log.info() << "getPosition(1):               " << elmoDrives.getPosition(1);
-			log.info() << "ll_getPositionActualValue(1): " << elmoDrives.ll_getPositionActualValue(1);
-			log.info() << "ll_getStatusWord(0): 0x" << elmoDrives.getDriveStatusStringElmo(0);
-			log.info() << "ll_getStatusWord(1): 0x" << elmoDrives.getDriveStatusStringElmo(1);
-			log.info();
-		wait(4);
-		step_setVelocity(1, 0);
 		SS.triggerEvent(safetyProp.disableDrives);
 		
 		
