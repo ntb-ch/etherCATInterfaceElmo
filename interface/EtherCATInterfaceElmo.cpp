@@ -1,8 +1,11 @@
-#include "EtherCATInterfaceElmo.hpp"
+#include <EtherCATInterfaceElmo.hpp>
 
 using namespace etherCATInterface;
 
-EtherCATInterfaceElmo::EtherCATInterfaceElmo(ecmasterlib::EcMasterlibMain* etherCATStack): 
+EtherCATInterfaceElmo::EtherCATInterfaceElmo(ecmasterlib::EcMasterlibMain* etherCATStack, int numberOfDrives, int bytesPerSlaveTx, int bytesPerSlaveRx): 
+numberOfDrives(numberOfDrives),
+bytesPerSlaveTx(bytesPerSlaveTx),
+bytesPerSlaveRx(bytesPerSlaveRx),
 EtherCATInterfaceBase(etherCATStack, numberOfDrives, bytesPerSlaveTx, bytesPerSlaveRx)
 { }
 
@@ -694,6 +697,7 @@ void EtherCATInterfaceElmo::ll_setInterpolatedDataRecord2(int driveNumber, int32
 
 void EtherCATInterfaceElmo::ll_setTargetVelocity(int driveNumber, int32_t targetVelocity)
 {
+    std::cout << "ll_setTargetVelocity   drive: " << driveNumber << "   targetVel: " << targetVelocity << std::endl;
 	set32bit(oo_targetVelocity, driveNumber, targetVelocity);
 }
 

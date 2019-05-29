@@ -55,7 +55,7 @@ int main(int argc, char **argv) {
 	ecmasterlib::EcMasterlibMain* etherCATStack = ecmasterlib::EcMasterlibMain::createInstance(argc, argv, global::byteSizePerSlave*global::numberOfDrivesTotal);
 	signal(SIGINT, signalHandler);
 	sleep(9);
-	EtherCATInterfaceElmo elmoDrives = EtherCATInterfaceElmo( etherCATStack );
+	EtherCATInterfaceElmo elmoDrives = EtherCATInterfaceElmo( etherCATStack, 2, 32, 32 );
 	bool allDrivesAreSwitchedOn = false;
 	
 	// HAL

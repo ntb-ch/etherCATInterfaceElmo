@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
 	signal(SIGINT, signalHandler);
 	etherCATStackPtr = etherCATStack;
 	sleep(9);
-	EtherCATInterfaceElmo elmoDrives = EtherCATInterfaceElmo( etherCATStack );
+	EtherCATInterfaceElmo elmoDrives = EtherCATInterfaceElmo( etherCATStack, 2, 32, 32 );
 	elmoDrivesPtr = &elmoDrives;
 	//   movingchair::MovingChairEtherCAT chairEtherCAT(etherCATStack);
 	//	while(1) { sleep(1); }

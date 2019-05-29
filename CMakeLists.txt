@@ -2,25 +2,35 @@ cmake_minimum_required(VERSION 2.8)
  
 project(ethercattest)
 
-## EEROS
+## Find package EEROS
 ## ////////////////////////////////////////////////////////////////////////////
-find_package(EEROS REQUIRED)
-add_definitions(-DUSE_ETHERCAT)
-include_directories(${EEROS_INCLUDE_DIR};${EEROS_LIBUCL_INCLUDE_DIR})
-link_directories(${EEROS_LIB_DIR};${EEROS_LIBUCL_LINK_DIR})
 
-include_directories(${ADDITIONAL_INCLUDE_DIRS})
-link_directories(${ADDITIONAL_LINK_DIRS})
+message(STATUS "")
+message(STATUS "EEROS")
+message(STATUS "**********************************")
+find_package(EEROS QUIET)
+if (EEROS_LIB_DIR)
+	message(STATUS "--> EEROS found, EEROS example will be built")
+    include_directories(${EEROS_INCLUDE_DIR};${EEROS_LIBUCL_INCLUDE_DIR})
+    link_directories(${EEROS_LIB_DIR};${EEROS_LIBUCL_LINK_DIR})
+else    ()
+	message(STATUS "--> EEROS NOT found, EEROS example will NOT be built")
+endif (EEROS_LIB_DIR)
+
+# include_directories(${ADDITIONAL_INCLUDE_DIRS})
+# link_directories(${ADDITIONAL_LINK_DIRS})
 
 
 ## ecmasterlib
 ## Find package ecmasterlib
+## ////////////////////////////////////////////////////////////////////////
 message(STATUS "")
 message(STATUS "EtherCAT")
 message(STATUS "**********************************")
 find_package(ecmasterlib REQUIRED)
-if (ECMASTERLIB_LIB_DIR)
+if  (ECMASTERLIB_LIB_DIR)
 	message(STATUS "--> ecmasterlib found")
+    message(STATUS "")
 	include_directories("${ECMASTERLIB_INCLUDE_DIR}")
 	link_directories("${ECMASTERLIB_LIB_DIR}")
 	set(EXTERNAL_LIBS ${EXTERNAL_LIBS} ecmasterlib)
@@ -53,15 +63,19 @@ add_executable(exampleStandalone
  								example_standalone/main.cpp
 )
 
-add_executable(exampleEeros
- 								example_eeros/main_eeros.cpp
- 								example_eeros/MyControlSystem.cpp
- 								example_eeros/MySafetyProperties.cpp
-)
 
 target_link_libraries(EtherCATInterfaceElmo ecmasterlib ${CMAKE_DL_LIBS})
 target_link_libraries(exampleStandalone EtherCATInterfaceElmo ecmasterlib ${CMAKE_DL_LIBS})
-target_link_libraries(exampleEeros eeros ucl EtherCATInterfaceElmo ecmasterlib ${CMAKE_DL_LIBS})
+
+if  (EEROS_LIB_DIR)
+    add_executable(exampleEeros
+ 								example_eeros/main_eeros.cpp
+ 								example_eeros/MyControlSystem.cpp
+ 								example_eeros/MySafetyProperties.cpp
+    )
+    target_link_libraries(exampleEeros eeros ucl EtherCATInterfaceElmo ecmasterlib ${CMAKE_DL_LIBS})
+endif   (EEROS_LIB_DIR)
+
 
 add_subdirectory(interface)
 add_subdirectory(example_standalone)

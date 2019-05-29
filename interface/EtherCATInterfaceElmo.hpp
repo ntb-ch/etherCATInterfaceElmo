@@ -4,13 +4,13 @@
 #include <list>
 
 #include <EtherCATInterfaceBase.hpp>
-#include "EtherCATInterfaceElmo_config.hpp"
+#include <EtherCATInterfaceElmo_config.hpp>
 
 
 namespace etherCATInterface {
 	class EtherCATInterfaceElmo : public EtherCATInterfaceBase {
 	public:
-		EtherCATInterfaceElmo(ecmasterlib::EcMasterlibMain* etherCATStack);
+		EtherCATInterfaceElmo(ecmasterlib::EcMasterlibMain* etherCATStack, int numberOfDrives, int bytesPerSlaveTx, int bytesPerSlaveRx);
 		
 		// advanced set functions
 		//  call repeatedly until the method returns 'true'
@@ -22,7 +22,7 @@ namespace etherCATInterface {
 		void disableAllDrives();
 		void setControlWord(int driveNumber, controlWordCommand_ELMO word);
 		
-		// advanced get functions
+		// advancenableDriveed get functions
 		ecmasterlib::EcMasterlibMain* getEtherCATStack() { return etherCATStack; };
 		bool isAllDrivesReady();
 		bool isAllDrivesEnabled();
@@ -121,6 +121,11 @@ namespace etherCATInterface {
 		int16_t ll_getCurrentActualValue(int driveNumber);
 		
 		
+        public:
+        const int numberOfDrives;
+        int bytesPerSlaveTx;
+        int bytesPerSlaveRx;
+        
 		private:
 		ecmasterlib::EcMasterlibMain* etherCATStack;
 		uint8_t* inBuffer;
